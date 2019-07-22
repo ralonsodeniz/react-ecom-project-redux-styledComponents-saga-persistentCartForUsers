@@ -17,6 +17,7 @@ import {
   checkUserSessionEnd
 } from "./user.action"; // we need this actions for our sagas to trigger user reducer updates
 import updateCartPersistReducer from "../persist";
+import { persistor } from "../store";
 
 // we are creating a generator function that does the redundant code of both signIn generator functions
 export function* getSnapshotFromUserAuth(userAuth, additionalData) {
@@ -103,6 +104,7 @@ export function* signOut() {
     // we sign out the user from firebase auth using the .singOut() method from auth library
     yield auth.signOut();
     // and then we update our store to clear the user
+    persistor.pause(); // we pause the persistor before signing out to avoid deleting the cart because we want to preserve the user cart in the local storage for each user
     yield put(signOutSuccess());
   } catch (error) {
     yield put(signOutFailure());

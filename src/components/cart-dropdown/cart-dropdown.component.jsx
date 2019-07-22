@@ -5,20 +5,21 @@ import { createStructuredSelector } from "reselect";
 import { withRouter } from "react-router-dom"; // withRouter allowed us to get access to route props without having to drill them down as component props | map, history and location objects
 
 import CartItem from "../cart-item/cart-item.component";
-import { toggleCartHidden } from "../../redux/cart/cart.actions";
+import { toggleCartHidden, clearCart } from "../../redux/cart/cart.actions";
 import { selectCartItems } from "../../redux/cart/cart.selectors";
 
 import {
-  CartDropdownComponent,
-  CartItemsComponent,
+  CartDropdownContainer,
+  CartItemsContainer,
   EmptyMessageContainer,
-  CartDropdownButton
+  CartDropdownButton,
+  CartDropDownButtonContainer
 } from "./cart-dropdown.styles";
 // import "./cart-dropdown.styles.scss";
 
 const CartDropdown = ({ cartItems, history, dispatch }) => (
-  <CartDropdownComponent>
-    <CartItemsComponent>
+  <CartDropdownContainer>
+    <CartItemsContainer>
       {cartItems.length ? (
         cartItems.map(cartItem => (
           <CartItem key={cartItem.id} item={cartItem} />
@@ -26,20 +27,29 @@ const CartDropdown = ({ cartItems, history, dispatch }) => (
       ) : (
         <EmptyMessageContainer>Your cart is empty</EmptyMessageContainer>
       )}
-    </CartItemsComponent>
-    <CartDropdownButton
-      onClick={() => {
-        history.push("/checkout");
-        dispatch(toggleCartHidden()); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
-      }}
-    >
-      GO TO CHECKOUT
-    </CartDropdownButton>
-    {/* This is the same as above but using Link component from react-router-dom
+    </CartItemsContainer>
+    <CartDropDownButtonContainer>
+      <CartDropdownButton
+        onClick={() => {
+          history.push("/checkout");
+          dispatch(toggleCartHidden()); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
+        }}
+      >
+        GO TO CHECKOUT
+      </CartDropdownButton>
+      <CartDropdownButton
+        onClick={() => {
+          dispatch(clearCart()); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
+        }}
+      >
+        CLEAR CART
+      </CartDropdownButton>
+      {/* This is the same as above but using Link component from react-router-dom
     <Link to="/checkout">
       <CustomButton>GO TO CHECKOUT</CustomButton>
     </Link> */}
-  </CartDropdownComponent>
+    </CartDropDownButtonContainer>
+  </CartDropdownContainer>
 );
 
 const mapStateToProps = createStructuredSelector({
