@@ -13,11 +13,18 @@ import {
   CartItemsContainer,
   EmptyMessageContainer,
   CartDropdownButton,
-  CartDropDownButtonContainer
+  CartDropDownButtonContainer,
+  CartDropdownClearButton
 } from "./cart-dropdown.styles";
 // import "./cart-dropdown.styles.scss";
 
-const CartDropdown = ({ cartItems, history, dispatch }) => (
+const CartDropdown = ({
+  cartItems,
+  history,
+  dispatch,
+  clearCart,
+  toggleCartHidden
+}) => (
   <CartDropdownContainer>
     <CartItemsContainer>
       {cartItems.length ? (
@@ -32,22 +39,20 @@ const CartDropdown = ({ cartItems, history, dispatch }) => (
       <CartDropdownButton
         onClick={() => {
           history.push("/checkout");
-          dispatch(toggleCartHidden()); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
+          toggleCartHidden(); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
         }}
       >
         GO TO CHECKOUT
       </CartDropdownButton>
-      <CartDropdownButton
-        onClick={() => {
-          dispatch(clearCart()); // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
-        }}
+      {/* This is the same as above but using Link component from react-router-dom
+      <Link to="/checkout">
+      <CustomButton>GO TO CHECKOUT</CustomButton>
+      </Link> */}
+      <CartDropdownClearButton
+        onClick={clearCart} // instead of doing the whole mapDispatchToProps we just use the dispatch prop that connect passes to the component when we do not declare mapDispatchToProps and dispatches the action
       >
         CLEAR CART
-      </CartDropdownButton>
-      {/* This is the same as above but using Link component from react-router-dom
-    <Link to="/checkout">
-      <CustomButton>GO TO CHECKOUT</CustomButton>
-    </Link> */}
+      </CartDropdownClearButton>
     </CartDropDownButtonContainer>
   </CartDropdownContainer>
 );
@@ -56,13 +61,19 @@ const mapStateToProps = createStructuredSelector({
   cartItems: selectCartItems
 });
 
-// const mapDispatchToProps = dispatch => ({
-//   toggleCartHidden: () => dispatch(toggleCartHidden())
-// });
+const mapDispatchToProps = dispatch => ({
+  toggleCartHidden: () => dispatch(toggleCartHidden()),
+  clearCart: () => dispatch(clearCart())
+});
 // IMPORTANT ABOUT CONNECT!
 // if we do not pass the second argument into the first parameter of connect, mapDispatchToProps, connect does pass dispatch as a prop to the component
 // the reason it does this is because if we need to do one of action dispatch there is no reason to write mapDispatchToProps
 
-export default withRouter(connect(mapStateToProps)(CartDropdown));
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(CartDropdown)
+);
 // withRouter() is a HOC and so it takes a component as a parameter and returns a new one modified with added functionalities, in this case it takes the component out of connect HOC
 // we need to get the connected component first and then connect to the router
